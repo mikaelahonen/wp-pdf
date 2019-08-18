@@ -1,0 +1,4 @@
+config.py
+export/*
+*.log
+__pycache__
