@@ -40,7 +40,7 @@ pdfkit.from_url('https://example.com', 'output.pdf')
 
 If you are satisfied to have screenshots only, it is easily achieved with Selenium. After initializing the selenium browser driver the full page screenshot would work like this:
 ```py
-driver.get(https://example.com)
+driver.get('https://example.com')
 screenshot_data = driver.page_source.find_element_by_tag_name('body').screenshot_as_png
 f_img = open('screenshot.png', 'wb')
 f_img.write(screenshot_data)
@@ -55,6 +55,7 @@ Other options to deliver the post for the other person would have been:
 * Copy paste to Google Docs (Boring)
 * Print as PDF manually from Google Chrome (The layout was messed up)
 * Save the html to another password protected directory on the web server (Complicated)
+* Wordpress API (Realised too late...)
 
 ## Issues with Chrome driver for python selenium
 I tried using `Google Chrome` browser and driver for my project. However, I constantly faced some issues. That was probably due to incompatible versions between `selenium` and Chrome. This was the setup:
