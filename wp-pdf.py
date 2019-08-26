@@ -2,14 +2,15 @@
 import time
 
 #Load config
-import config
 from module import *
 
-#Initialize selenium driver
-driver = create_driver()
+if initialize():
 
-driver = enter_credentials(driver)
-driver = login(driver)
-driver = save_post(driver)
+    #Initialize selenium driver
+    driver = create_driver()
 
-kill_driver(driver)
+    driver = enter_credentials(driver)
+    driver = login(driver)
+    driver = save_post(driver)
+
+    kill_driver(driver)

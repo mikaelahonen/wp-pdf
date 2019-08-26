@@ -25,9 +25,21 @@ The output PDF was pretty good. Some elements were positioned slightly off, but 
 3. Install `python-selenium` and `pdf-kit` python packages
 3. Rename the `config_example.py` to `config.py`
 4. Fill in the correct parameters to `config.py`
-5. Run `wp-pdf.py`
+5. Run `wp-pdf.py` from the directory of this project
 6. If you face problem, read about the issues from this document
 
+Depending on your system configuration, the commands are something like this:
+```sh
+pip3 install pdfkit selenium
+sudo apt update
+sudo apt install wkhtmltopdf
+sudo apt install firefox
+cd ~
+wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
+tar -xvzf geckodriver*
+chmod +x geckodriver
+sudo mv geckodriver /usr/local/bin/
+```
 
 ## Technical review
 
@@ -68,6 +80,13 @@ The solution was to switch to `Firefox` browser and `geckodriver`.
 ## Issues with pdfkit and Wkhtmltopdf
 The `pdfkit` package for python is a wrapper for `Wkhtmltopdf` command line tool. The version `0.6.1` of pdfkit installed the version `0.12.4` of Wkhtmltopdf. The solution was to upgrade to `0.12.5` of Wkhtmltopdf.
 
+```sh
+cd ~
+wget https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb
+sudo dpkg -i wkhtmltox_0.12.5-1.bionic_amd64.deb
+sudo apt-get install -f
+```
+
 As I used `conda` package manager for python, Wkhtmltopdf was installed to `~/miniconda3/bin` in my case. Not in `/usr/bin` as usual.
 
 The error message was something like this:
@@ -99,4 +118,23 @@ QSslSocket: cannot resolve X509_STORE_CTX_get_chain
 QSslSocket: cannot resolve OPENSSL_add_all_algorithms_noconf
 QSslSocket: cannot resolve OPENSSL_add_all_algorithms_conf
 QSslSocket: cannot resolve SSLeay
+```
+
+The version `0.12.5` of wkhtmltopdf also solved this error:
+```sh
+Traceback (most recent call last):
+  File "wp-pdf.py", line 20, in <module>
+    driver = save_post(driver)
+  File "/mnt/c/Users/username/projects/wp-pdf/module.py", line 144, in save_post
+    export(driver, "pdf", "wp_post", url=html_path)
+  File "/mnt/c/Users/username/projects/wp-pdf/module.py", line 79, in export
+    pdfkit.from_url(url, f_path)
+  File "/home/ubuntu/.local/lib/python3.6/site-packages/pdfkit/api.py", line 26, in from_url
+    return r.to_pdf(output_path)
+  File "/home/ubuntu/.local/lib/python3.6/site-packages/pdfkit/pdfkit.py", line 159, in to_pdf
+    raise IOError("wkhtmltopdf exited with non-zero code {0}. error:\n{1}".format(exit_code, stderr))
+OSError: wkhtmltopdf exited with non-zero code 1. error:
+QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-ubuntu'
+qt.qpa.screen: QXcbConnection: Could not connect to display
+Could not connect to any X display.
 ```

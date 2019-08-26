@@ -1,3 +1,4 @@
+import os
 import sys
 import logging
 import time
@@ -12,7 +13,7 @@ from selenium.common import exceptions
 #Logging
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s",
+    format="%(asctime)s [%(levelname)-5.5s]  %(message)s",
     handlers=[
         logging.FileHandler("{0}/{1}.log".format(".", "log")),
         logging.StreamHandler()
@@ -27,19 +28,7 @@ file_count = {
     "html": 0,
 }
 
-def create_driver():
-
-    options = Options()
-    options.add_argument('-headless')
-
-    #executable_path= for the driver path
-    driver = webdriver.Firefox(options=options)
-
-    logger.info('Driver initialized')
-
-    return driver
-
-def fix_html(html):
+def _fix_html(html):
 
     protocol = config.post_url.split("://")[0]
     #Single quotes
@@ -50,7 +39,7 @@ def fix_html(html):
     return html
 
 
-def export(driver, extension="png", name="", data="", url="", full_screen=False):
+def _export(driver, extension="png", name="", data="", url="", full_screen=False):
 
     #Get file type
     folder = {
@@ -86,12 +75,46 @@ def export(driver, extension="png", name="", data="", url="", full_screen=False)
 
     return f_path
 
+def _create_dir(dir_path):
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+        log_txt = "Created directory {}".format(dir_path)
+        logger.info(log_txt)
+    else:
+        pass
+
+def initialize():
+
+    if "example.com" in config.post_url:
+        logger.info("Initializing the environment")
+    else:
+        logger.info("Environment exists")
+
+    _create_dir(config.export_dir)
+
+    for d in ["img", "pdf", "html"]:
+        _create_dir(config.export_dir + d)
+
+    return True
+
+def create_driver():
+
+    options = Options()
+    options.add_argument('-headless')
+
+    #executable_path= for the driver path
+    driver = webdriver.Firefox(options=options)
+
+    logger.info('Driver initialized')
+
+    return driver
+
 def enter_credentials(driver):
     #Go to wordpress login page
     driver.get(config.login_url)
     driver.find_element_by_id(config.wp_user_id).send_keys(config.user)
     driver.find_element_by_id (config.wp_pswd_id).send_keys(config.pswd)
-    export(driver, 'png', 'wp_credentials')
+    _export(driver, 'png', 'wp_credentials')
     logger.info("Entered wp user and password")
 
     return driver
@@ -111,7 +134,7 @@ def login(driver):
     while (attempt < config.max_retries) and again:
 
         attempt += 1
-        export(driver, "png", 'wp_login')
+        _export(driver, "png", 'wp_login')
 
         try:
             #driver.get(config.login_url)
@@ -133,15 +156,15 @@ def save_post(driver):
 
     #Get page source
     post_source = driver.page_source#find_element_by_id(wp_post_id).get_attribute('innerHTML')
-    post_source = fix_html(post_source)
+    post_source = _fix_html(post_source)
     screenshot_data = driver.find_element_by_tag_name('body').screenshot_as_png
     logger.info("Crawled blog post content")
 
     #Export
-    export(driver, "png", 'wp_post_screen')
-    export(driver, "png", 'wp_post_full', data=screenshot_data, full_screen=True)
-    html_path = export(driver, "html", "wp_post", data=post_source)
-    export(driver, "pdf", "wp_post", url=html_path)
+    _export(driver, "png", 'wp_post_screen')
+    _export(driver, "png", 'wp_post_full', data=screenshot_data, full_screen=True)
+    html_path = _export(driver, "html", "wp_post", data=post_source)
+    _export(driver, "pdf", "wp_post", url=html_path)
 
     return driver
 

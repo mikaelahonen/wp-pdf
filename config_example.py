@@ -10,9 +10,9 @@ wp_pswd_id = "user_pass"
 #Id of login button html element in wordpress login page
 wp_submit_id = "wp-submit"
 #Login page of your Wordpress site
-login_url = "https://wordpressexamplesite.com/wp-admin"
+login_url = "https://example.com/wp-admin"
 #Url of the Wordpress blog draft that you would like to convert to PDF
-post_url = "https://wordpressexamplesite.com/?p=1234"
+post_url = "https://example.com/?p=1234"
 #Wordpress username
 user = "admin"
 #Wordpress passwword
